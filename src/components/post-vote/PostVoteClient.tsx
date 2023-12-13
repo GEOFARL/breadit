@@ -33,7 +33,7 @@ const PostVoteClient: FC<PostVoteClientProps> = ({
     setCurrentVote(initialVote);
   }, [initialVote]);
 
-  const { mutate: vote } = useMutation({
+  const { mutate: vote, isLoading } = useMutation({
     mutationFn: async (voteType: VoteType) => {
       const payload: PostVoteRequest = {
         postId,
@@ -82,7 +82,9 @@ const PostVoteClient: FC<PostVoteClientProps> = ({
   return (
     <div className="flex sm:flex-col gap-4 sm:gap-0 pr-6 sm:w-20 pb-4 sm:pb-0">
       <Button
-        onClick={() => vote('UP')}
+        onClick={() => {
+          if (!isLoading) vote('UP');
+        }}
         size={'sm'}
         variant={'ghost'}
         aria-label="upvote"
@@ -99,7 +101,9 @@ const PostVoteClient: FC<PostVoteClientProps> = ({
       </p>
 
       <Button
-        onClick={() => vote('DOWN')}
+        onClick={() => {
+          if (!isLoading) vote('DOWN');
+        }}
         size={'sm'}
         variant={'ghost'}
         aria-label="downvote"

@@ -55,6 +55,24 @@ export async function PATCH(req: Request) {
           },
         });
 
+        const votesAmt = post.votes.reduce((acc, vote) => {
+          if (vote.type === 'UP') return acc + 1;
+          if (vote.type === 'DOWN') return acc - 1;
+          return acc;
+        }, 0);
+
+        if (votesAmt >= CACHE_AFTER_UPVOTES) {
+          const cachePayload: CachedPost = {
+            authorUsername: post.author.username ?? '',
+            content: JSON.stringify(post.content),
+            id: post.id,
+            title: post.title,
+            currentVote: null,
+            createdAt: post.createdAt,
+          };
+
+          await redis.hset(`post:${postId}`, cachePayload);
+        }
         return new Response('OK');
       }
 
@@ -105,7 +123,6 @@ export async function PATCH(req: Request) {
       },
     });
 
-    // recount the votes
     const votesAmt = post.votes.reduce((acc, vote) => {
       if (vote.type === 'UP') {
         return acc + 1;
