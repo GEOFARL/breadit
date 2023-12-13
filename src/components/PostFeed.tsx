@@ -6,8 +6,9 @@ import { useIntersection } from '@mantine/hooks';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Post from './Post';
+import { Loader2 } from 'lucide-react';
 
 interface PostFeedProps {
   initialPosts: ExtendedPost[];
@@ -28,7 +29,7 @@ const PostFeed: React.FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
     queryFn: async ({ pageParam = 1 }) => {
       const query =
         `/api/posts?limit=${INFINITE_SCROLLING_PAGINATION_RESULTS}&page=${pageParam}` +
-        (!!subredditName ? `subredditName=${subredditName}` : '');
+        (!!subredditName ? `&subredditName=${subredditName}` : '');
 
       const { data } = await axios.get(query);
 
@@ -37,13 +38,17 @@ const PostFeed: React.FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
     getNextPageParam: (_, pages) => {
       return pages.length + 1;
     },
-    initialData: {
-      pages: [initialPosts],
-      pageParams: [1],
-    },
   });
 
-  const posts = data?.pages.flatMap((page) => page) ?? initialPosts;
+  useEffect(() => {
+    if (entry?.isIntersecting) {
+      fetchNextPage(); // Load more posts when the last post comes into view
+    }
+  }, [entry, fetchNextPage]);
+
+  const posts =
+    [...initialPosts, ...(data?.pages.flatMap((page) => page) || [])] ??
+    initialPosts;
 
   return (
     <ul className="flex flex-col col-span-2 space-y-6">
@@ -65,6 +70,8 @@ const PostFeed: React.FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
                 commentAmt={post.comments.length}
                 subredditName={post.subreddit.name}
                 post={post}
+                currentVote={currentVote}
+                votesAmt={votesAmt}
               />
             </li>
           );
@@ -76,10 +83,17 @@ const PostFeed: React.FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
               commentAmt={post.comments.length}
               subredditName={post.subreddit.name}
               post={post}
+              currentVote={currentVote}
+              votesAmt={votesAmt}
             />
           </li>
         );
       })}
+      {isFetchingNextPage && (
+        <li className="flex justify-center">
+          <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
+        </li>
+      )}
     </ul>
   );
 };
