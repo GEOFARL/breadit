@@ -76,7 +76,7 @@ export async function PATCH(req: Request) {
         return new Response('OK');
       }
 
-      db.vote.update({
+      await db.vote.update({
         where: {
           userId_postId: {
             postId,

@@ -1,19 +1,19 @@
 'use client';
 
-import { FC, useRef, useState } from 'react';
-import UserAvatar from './UserAvatar';
-import { Comment, CommentVote, User, VoteType } from '@prisma/client';
 import { formatTimeToNow } from '@/lib/utils';
-import CommentVotes from './CommentVotes';
-import { Button } from './ui/Button';
+import { CommentRequest } from '@/lib/validators/comment';
+import { Comment, CommentVote, User } from '@prisma/client';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
 import { MessageSquare } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { FC, useRef, useState } from 'react';
+import CommentVotes from './CommentVotes';
+import UserAvatar from './UserAvatar';
+import { Button } from './ui/Button';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
-import { useMutation } from '@tanstack/react-query';
-import { CommentRequest } from '@/lib/validators/comment';
-import axios from 'axios';
 import { toast } from './ui/use-toast';
 
 type ExtendedComment = Comment & {

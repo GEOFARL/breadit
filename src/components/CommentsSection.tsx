@@ -40,8 +40,8 @@ const CommentsSection: FC<CommentsSectionProps> = async ({ postId }) => {
           .map((topLevelComment) => {
             const topLevelCommentVotesAmt = topLevelComment.votes.reduce(
               (acc, vote) => {
-                if (vote.type === 'UP') acc + 1;
-                if (vote.type === 'DOWN') acc - 1;
+                if (vote.type === 'UP') return acc + 1;
+                if (vote.type === 'DOWN') return acc - 1;
                 return acc;
               },
               0
@@ -66,8 +66,8 @@ const CommentsSection: FC<CommentsSectionProps> = async ({ postId }) => {
                   .sort((a, b) => b.votes.length - a.votes.length)
                   .map((reply) => {
                     const replyVotesAmt = reply.votes.reduce((acc, vote) => {
-                      if (vote.type === 'UP') acc + 1;
-                      if (vote.type === 'DOWN') acc - 1;
+                      if (vote.type === 'UP') return acc + 1;
+                      if (vote.type === 'DOWN') return acc - 1;
                       return acc;
                     }, 0);
 
