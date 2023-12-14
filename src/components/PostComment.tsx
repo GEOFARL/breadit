@@ -14,6 +14,7 @@ import { Textarea } from './ui/textarea';
 import { useMutation } from '@tanstack/react-query';
 import { CommentRequest } from '@/lib/validators/comment';
 import axios from 'axios';
+import { toast } from './ui/use-toast';
 
 type ExtendedComment = Comment & {
   votes: CommentVote[];
@@ -54,6 +55,18 @@ const PostComment: FC<PostCommentProps> = ({
       );
 
       return data;
+    },
+    onError: () => {
+      return toast({
+        title: 'Something went wrong',
+        description: "Comment wasn't posted successfully, please try again.",
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      router.refresh();
+      setIsReplying(false);
+      setInput('');
     },
   });
 
