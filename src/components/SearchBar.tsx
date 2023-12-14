@@ -9,12 +9,13 @@ import {
   CommandList,
   CommandItem,
 } from './ui/command';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { Prisma, Subreddit } from '@prisma/client';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Users } from 'lucide-react';
 import debounce from 'lodash.debounce';
+import { useOnClickOutside } from '@/hooks/use-on-click-outside';
 
 const SearchBar = () => {
   const [input, setInput] = useState<string>('');
@@ -40,22 +41,38 @@ const SearchBar = () => {
     enabled: false,
   });
 
+  const commandRef = useRef<HTMLDivElement | null>(null);
+  const pathname = usePathname();
+
   const request = debounce(() => {
     refetch();
   }, 300);
 
   const debounceRequest = useCallback(() => {
     request();
+    // eslint-disable-next-line
   }, []);
 
+  useOnClickOutside(commandRef, () => {
+    setInput('');
+  });
+
+  useEffect(() => {
+    setInput('');
+  }, [pathname]);
+
   return (
-    <Command className="relative rounded-lg border max-w-lg z-50 overflow-visible">
+    <Command
+      ref={commandRef}
+      className="relative rounded-lg border max-w-lg z-50 overflow-visible"
+    >
       <CommandInput
         value={input}
         onValueChange={(text) => {
           setInput(text);
           debounceRequest();
         }}
+        isLoading={isFetching}
         className="outline-none border-none focus:border-none focus:outline-none ring-0"
         placeholder="Search communities..."
       />
