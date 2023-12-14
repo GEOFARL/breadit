@@ -101,18 +101,17 @@ model Comment {
   id       String   @id @default(cuid())
   text     String
   cratedAt DateTime @default(now())
-  author   User     @relation(fields: [userId], references: [id])
+  author   User     @relation(fields: [authorId], references: [id])
   authorId String
   Post     Post     @relation(fields: [postId], references: [id])
   postId   String
-  userId   String
 
   replyToId String?
   replyTo   Comment?  @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   replies   Comment[] @relation("ReplyTo")
 
-  commentId   String
-  CommentVote CommentVote[]
+  commentId String?
+  votes     CommentVote[]
 }
 
 enum VoteType {
